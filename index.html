@@ -1,0 +1,161 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<title>WeatherGet!</title>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+  			<div class="container-fluid">
+    		<!-- Brand and toggle get grouped for better mobile display -->
+    			<div class="navbar-header">
+      				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        				<span class="sr-only">Toggle navigation</span>
+        				<span class="icon-bar"></span>
+    	    			<span class="icon-bar"></span>
+	        			<span class="icon-bar"></span>
+      				</button>
+      				<a class="navbar-brand" href="https://www.tpage.io">Home</a>
+    			</div>
+    		</div>
+    	</nav>
+		<div class="container">
+			<div class="row clearfix">
+				<div class="col-md-12 column">
+					<div class="jumbotron well text-center">
+						<h1>
+							Hello!
+						</h1>
+						<p>
+							This is a basic weather app that displays weather information and changes
+							the background based on the type of weather.
+						</p>
+						<p>
+							<a class="btn btn-primary btn-large" href="#zipcode" data-toggle="modal">Get started!</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="zipcode" role="dialog">
+    		<div class="modal-dialog">
+    			<div class="modal-content">
+    				<form class="form-horizontal" role="form">
+    					<div class="modal-header">
+    						<h4>Enter Zipcode</h4>
+						</div>
+	    				<div class="modal-body">
+    						<div class="form-group">
+    							<label for="zip-code" class="col-sm-2 control-label">Zipcode</label>
+    							<div class="col-sm-10">
+	    							<input type="number"  required class="form-control" id="zip-code" placeholder="Type your zip code here">
+    							</div>
+    						</div>
+						</div>
+	    				<div class="modal-footer">
+	    					<a class="btn btn-default" data-dismiss="modal">Close</a>
+    						<a class="btn btn-primary" id="zip-btn" data-dismiss="modal">Submit</a>
+    					</div>
+					</form>
+				</div>
+    		</div>
+    	</div>
+    	<div class="modal fade" id="weather" role="dialog">
+    		<div class="modal-dialog">
+    			<div class="modal-content">
+    				<form class="form-horizontal" role="form">
+    					<div class="modal-header">
+    						<h4>Current Weather Information (OpenWeatherMap.com)</h4>
+						</div>
+	    				<div class="modal-body">
+    						<div class="form-group">
+    							<table class="table table-striped" id="weather-info">
+                					<thead>
+                  						<tr>
+                    						<th>Information</th>
+                  						</tr>
+                					</thead>
+                					<tbody>
+                					</tbody>
+              					</table>
+    						</div>
+						</div>
+	    				<div class="modal-footer">
+	    					<a class="btn btn-default" data-dismiss="modal" id="weather-close">Close</a>
+    					</div>
+					</form>
+				</div>
+    		</div>
+    	</div>
+    	<script type="text/javascript">
+    		$('#zip-btn').on('click', function (e) {
+
+    			//get data from zipcode field in modal
+     			var zipcode = document.getElementById("zip-code").value;
+
+     			//api key for openweathermap
+     			var apikey = "&APPID=85bbc4bccc488acb4223878d7437b1a9"
+
+     			//weather api format
+     			var weatherurl = "http://api.openweathermap.org/data/2.5/weather?zip=" + zipcode + ",us&units=imperial" + apikey;
+     			var xmlHttp = null;
+
+     			//forge http get request
+    			xmlHttp = new XMLHttpRequest();
+
+    			//			("GET/POST, url, ASYNC/NO ASYNC")
+    			xmlHttp.open( "GET", weatherurl, false );
+
+    			//send request
+    			xmlHttp.send(null);
+
+                //200 = OK
+    			if (xmlHttp.status == 200)
+    			{
+    				//data returned as JSON, parse and store in weatherdata
+    				var weatherdata = JSON.parse(xmlHttp.responseText);
+
+    				//get weather information from parsed JSON data
+    				console.log("Zipcode entered: "+zipcode);
+    				console.log("URL used as GET request:");
+    				console.log(weatherurl);
+    				console.log("Raw JSON data from request:");
+    				console.log(weatherdata);
+    				console.log("Location: " +weatherdata.name);
+    				console.log("Temperature: "+weatherdata["main"].temp+"°F");
+
+    				$('#weather-info tbody').append("<tr><th>Forecast:</th><th>"+weatherdata["weather"][0].description+"</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Location:</th><th>"+weatherdata.name+"</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Temperature:</th><th>"+weatherdata["main"].temp+"°F</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Humidity:</th><th>"+weatherdata["main"].humidity+"%</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Pressure:</th><th>"+weatherdata["main"].pressure+" (hPa)</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Wind Speed:</th><th>"+weatherdata["wind"].speed+" mph</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Lattitude:</th><th>"+weatherdata["coord"].lat+"°</th></tr>");
+    				$('#weather-info tbody').append("<tr><th>Longitude:</th><th>"+weatherdata["coord"].lon+"°</th></tr>");
+
+    				$("#weather").modal("show");
+    			}
+
+    			else
+    			{
+    				console.log("Error!  Request status: "+xmlHttp.status);
+    			}
+			})
+    	</script>
+    	<script type="text/javascript">
+    		$('#weather-close').on('click', function (e) {
+    			$('#weather-info tbody').html('');
+    		})
+    	</script>
+	</body>
+</html>
